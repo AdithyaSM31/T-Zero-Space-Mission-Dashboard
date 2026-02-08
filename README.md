@@ -12,6 +12,7 @@ T-Zero is a unified, real-time space mission dashboard that aggregates data from
 - **Fleet Explorer**: Interactive comparison of rockets from SpaceX, NASA, and ISRO.
 - **Mission Timeline**: Historical view of humanity's space journey.
 - **Analytics Hub**: Comparative analytics and success metrics.
+- **Mobile App**: Android APK support via Capacitor.
 
 ## Tech Stack
 
@@ -21,6 +22,7 @@ T-Zero is a unified, real-time space mission dashboard that aggregates data from
 - **Animations**: Framer Motion
 - **Icons**: Lucide React
 - **Charts**: Recharts
+- **Mobile**: Capacitor (Android)
 
 ## Getting Started
 
@@ -38,16 +40,40 @@ T-Zero is a unified, real-time space mission dashboard that aggregates data from
 
 3.  Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Building for Android
+
+To create the APK:
+
+1.  **Configure API**:
+    Updates `NEXT_PUBLIC_API_URL` to point to your live backend (or a placeholder like `https://t-zero.vercel.app`) in your environment. The Android app requires an internet-accessible API.
+
+2.  **Build Static Frontend**:
+    Run the build command with the Android target flag. This handles the static export required by Capacitor.
+    ```bash
+    # Windows (PowerShell)
+    $env:BUILD_TARGET='android'; npm run build
+    
+    # Mac/Linux
+    BUILD_TARGET=android npm run build
+    ```
+    *Note: You may need to temporarily hide `src/app/api` if build fails on API routes.*
+
+3.  **Sync Capacitor**:
+    ```bash
+    npx cap sync
+    ```
+
+4.  **Compile APK**:
+    Open the `android` folder in **Android Studio** and run the project.
+    *Requirement: JDK 21+ is required.*
+
 ## Project Structure
 
 - `src/app`: Page routes and layouts.
 - `src/components`: Reusable UI components.
 - `src/lib`: Utility functions.
+- `android`: Native Android project files.
 
-## Future Roadmap
-
-- Integration with real APIs (SpaceX-API, NASA Open APIs).
-- User authentication for saving favorites.
 - 3D visualizations of rockets.
 
 ---

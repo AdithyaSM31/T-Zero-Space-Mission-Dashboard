@@ -1,11 +1,30 @@
+"use client";
+
+import { useEffect, useState, Suspense } from "react";
 import { getRecentLaunches, Launch } from "@/lib/api";
-import { Suspense } from "react";
 import { LoadingList } from "@/components/Loading";
 
-export const revalidate = 3600;
+function TimelineContent() {
+  const [launches, setLaunches] = useState<Launch[]>([]);
+  const [loading, setLoading] = useState(true);
 
-async function TimelineData() {
-  const launches = await getRecentLaunches(30);
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const data = await getRecentLaunches(30);
+        setLaunches(data);
+      } catch (e) {
+        console.error("Failed to load timeline data", e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  if (loading) {
+      return <LoadingList />;
+  }
 
   // Group launches by year
   const launchesByYear = launches.reduce((acc, launch) => {
@@ -80,7 +99,7 @@ export default function MissionTimeline() {
     <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12">
       <h1 className="text-3xl font-bold tracking-tight text-white mb-8">Mission Timeline</h1>
       <Suspense fallback={<LoadingList />}>
-          <TimelineData />
+          <TimelineContent />
       </Suspense>
     </div>
   );

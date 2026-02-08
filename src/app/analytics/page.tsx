@@ -1,12 +1,36 @@
-import { getAnalyticsData } from "@/lib/api";
+"use client";
+
+import { useEffect, useState, Suspense } from "react";
+import { getAnalyticsData, Launch } from "@/lib/api";
 import { AnalyticsCharts } from "@/components/AnalyticsCharts";
-import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/Loading";
 
-export const revalidate = 3600;
+function AnalyticsContent() {
+    const [launches, setLaunches] = useState<Launch[]>([]);
+    const [loading, setLoading] = useState(true);
 
-async function AnalyticsData() {
-    const launches = await getAnalyticsData();
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const data = await getAnalyticsData();
+                setLaunches(data);
+            } catch (e) {
+                console.error("Failed to fetch analytics data", e);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchData();
+    }, []);
+
+    if (loading) {
+         return (
+            <div className="h-96 flex items-center justify-center bg-white/5 rounded-2xl border border-white/10">
+                <LoadingSpinner />
+            </div>
+         );
+    }
+    
     return <AnalyticsCharts launches={launches} />;
 }
 
@@ -21,7 +45,7 @@ export default function AnalyticsHub() {
               <LoadingSpinner />
           </div>
       }>
-        <AnalyticsData />
+        <AnalyticsContent />
       </Suspense>
     </div>
   );
