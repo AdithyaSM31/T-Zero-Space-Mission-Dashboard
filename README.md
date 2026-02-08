@@ -1,33 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# T-Zero: Space Mission Dashboard
+
+**The New Era of Space Exploration**
+
+Your unified command center for the modern space race. Track real-time missions, analyze launch data, and witness humanity's journey to the stars.
+
+T-Zero is a unified, real-time space mission dashboard that aggregates data from different space agencies into one accessible platform.
+
+## Features
+
+- **Launch Center**: Real-time countdowns and upcoming mission tracking.
+- **Fleet Explorer**: Interactive comparison of rockets from SpaceX, NASA, and ISRO.
+- **Mission Timeline**: Historical view of humanity's space journey.
+- **Analytics Hub**: Comparative analytics and success metrics.
+
+## Tech Stack
+
+- **Framework**: [Next.js](https://nextjs.org) (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+- **Charts**: Recharts
 
 ## Getting Started
 
-First, run the development server:
+1.  **Install dependencies:**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+    ```bash
+    npm install
+    ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2.  **Run the development server:**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+    ```bash
+    npm run dev
+    ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3.  Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+- `src/app`: Page routes and layouts.
+- `src/components`: Reusable UI components.
+- `src/lib`: Utility functions.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Future Roadmap
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Integration with real APIs (SpaceX-API, NASA Open APIs).
+- User authentication for saving favorites.
+- 3D visualizations of rockets.
+
+---
+
+*"Ensuring peace and sustainability in the final frontier."*
 
 ## Deploy on Vercel
 
