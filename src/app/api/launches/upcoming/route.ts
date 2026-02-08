@@ -15,15 +15,19 @@ export async function GET(request: Request) {
       url += `&lsp__id=${agencyIds}`;
     }
     
-    // Fetch from external API with caching enabled on Vercel
-    const res = await fetch(url, { headers: { 'User-Agent': 'T-Zero/1.0' }, next: { revalidate: 3600 } });
+    const res = await fetch(url, { headers: { 'User-Agent': 'T-Zero/1.0' }, next: { revalidate: 60 } });
     
     if (!res.ok) {
         return NextResponse.json({ error: "Failed to fetch from Space Devs" }, { status: res.status });
     }
     
     const data = await res.json();
-    return NextResponse.json(data.results);
+    
+    // Filter out past launches to ensure consistency with the "Next" endpoint
+    const now = new Date().getTime();
+    const upcoming = data.results.filter((l: any) => new Date(l.net).getTime() > now);
+
+    return NextResponse.json(upcoming);
   } catch (error) {
     console.error("API Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
