@@ -59,7 +59,7 @@ export function Navbar() {
       {/* Mobile menu - Rendered outside header to escape sticky context */}
       <div
         className={cn(
-          "lg:hidden fixed inset-0 z-[9999] bg-[#020617] px-6 py-6 transition-transform duration-300 ease-in-out transform isolate",
+          "lg:hidden fixed inset-0 z-[9999] bg-[#020617] px-6 pb-6 pt-[calc(env(safe-area-inset-top)+1.5rem)] transition-transform duration-300 ease-in-out transform isolate",
           mobileMenuOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
