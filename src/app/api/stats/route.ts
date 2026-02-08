@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 const BASE_URLS = {
-  SPACE_DEVS: "https://lldev.thespacedevs.com/2.2.0",
+  SPACE_DEVS: "https://ll.thespacedevs.com/2.2.0",
 };
 
 export async function GET() {
