@@ -1,5 +1,9 @@
 # T-Zero: Space Mission Dashboard
 
+<p align="center">
+  <img src="logo.png" alt="T-Zero Logo" width="150" height="150" />
+</p>
+
 **The New Era of Space Exploration**
 
 Your unified command center for the modern space race. Track real-time missions, analyze launch data, and witness humanity's journey to the stars.
