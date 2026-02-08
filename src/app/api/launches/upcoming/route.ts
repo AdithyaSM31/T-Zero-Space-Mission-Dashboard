@@ -7,10 +7,15 @@ const BASE_URLS = {
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const limit = searchParams.get('limit') || '10';
+    const limitParam = searchParams.get('limit') || '10';
+    const limit = parseInt(limitParam, 10);
     const agencyIds = searchParams.get('agencyIds');
 
-    let url = `${BASE_URLS.SPACE_DEVS}/launch/upcoming/?limit=${limit}&mode=detailed`;
+    // Fetch extra records to account for filtering past launches
+    // Use a safe buffer (e.g. limit + 5)
+    const fetchLimit = limit + 5; 
+
+    let url = `${BASE_URLS.SPACE_DEVS}/launch/upcoming/?limit=${fetchLimit}&mode=detailed`;
     if (agencyIds) {
       url += `&lsp__id=${agencyIds}`;
     }
@@ -27,7 +32,8 @@ export async function GET(request: Request) {
     const now = new Date().getTime();
     const upcoming = data.results.filter((l: any) => new Date(l.net).getTime() > now);
 
-    return NextResponse.json(upcoming);
+    // Return only the requested amount
+    return NextResponse.json(upcoming.slice(0, limit));
   } catch (error) {
     console.error("API Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
