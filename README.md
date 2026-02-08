@@ -42,37 +42,53 @@ T-Zero is a unified, real-time space mission dashboard that aggregates data from
 
 ## Building for Android
 
-To create the APK:
+The Android application is a "Hybrid App". It runs the frontend locally on the device (via Capacitor) but fetches data from your deployed Next.js API.
 
-1.  **Configure API**:
-    Updates `NEXT_PUBLIC_API_URL` to point to your live backend (or a placeholder like `https://t-zero.vercel.app`) in your environment. The Android app requires an internet-accessible API.
+### Prerequisites
+- Android Studio
+- JDK 21+ installed
+- A deployed version of this repo (e.g., on Vercel) to serve the API.
 
-2.  **Build Static Frontend**:
-    Run the build command with the Android target flag. This handles the static export required by Capacitor.
+### Build Steps
+
+1.  **Deploy Backend**:
+    Push this repository to GitHub and deploy to Vercel. This ensures the API endpoints (`/api/...`) are live and accessible over the internet.
+    *Note: The project includes CORS configuration in `next.config.ts` to allow the Android app to talk to Vercel.*
+
+2.  **Generate Mobile Assets (Icons/Splash)**:
+    If you change `assets/logo.png`, regenerate the icons:
+    ```bash
+    npx @capacitor/assets generate --iconBackgroundColor '#020617' --splashBackgroundColor '#020617' --android
+    ```
+
+3.  **Build Static Frontend**:
+    Run the build with the Android target flag. Replace `NEXT_PUBLIC_API_URL` with your **actual Vercel Deployment URL**.
     ```bash
     # Windows (PowerShell)
-    $env:BUILD_TARGET='android'; npm run build
+    $env:NEXT_PUBLIC_API_URL='https://your-project.vercel.app'; $env:BUILD_TARGET='android'; npm run build
     
     # Mac/Linux
-    BUILD_TARGET=android npm run build
+    NEXT_PUBLIC_API_URL='https://your-project.vercel.app' BUILD_TARGET=android npm run build
     ```
-    *Note: You may need to temporarily hide `src/app/api` if build fails on API routes.*
+    *Note: `next build` might warn about headers being ignored for static export. This is expected—the headers are for the Vercel deployment, not the static Android files.*
 
-3.  **Sync Capacitor**:
+4.  **Sync Capacitor**:
+    Copy the build assets to the Android project.
     ```bash
     npx cap sync
     ```
 
-4.  **Compile APK**:
-    Open the `android` folder in **Android Studio** and run the project.
-    *Requirement: JDK 21+ is required.*
+5.  **Compile APK**:
+    Open the `android` folder in **Android Studio** and click **Run** or **Build > Build Bundle(s) / APK(s)**.
 
 ## Project Structure
 
 - `src/app`: Page routes and layouts.
 - `src/components`: Reusable UI components.
-- `src/lib`: Utility functions.
+- `src/lib`: Utility functions and API SDK.
 - `android`: Native Android project files.
+- `assets`: Source files for app icons and splash screens.
+
 
 - 3D visualizations of rockets.
 
