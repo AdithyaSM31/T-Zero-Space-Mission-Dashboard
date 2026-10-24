@@ -1,41 +1,36 @@
 import { NextResponse } from "next/server";
-
-const BASE_URLS = {
-  SPACE_DEVS: "https://ll.thespacedevs.com/2.2.0",
-};
-
+import {
+  boundedLimit,
+  LaunchSourceError,
+  upcomingSample,
+} from "@/lib/launch-source";
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const limitParam = searchParams.get('limit') || '10';
-    const limit = parseInt(limitParam, 10);
-    const agencyIds = searchParams.get('agencyIds');
-
-    // Fetch extra records to account for filtering past launches
-    // Use a safe buffer (e.g. limit + 5)
-    const fetchLimit = limit + 5; 
-
-    let url = `${BASE_URLS.SPACE_DEVS}/launch/upcoming/?limit=${fetchLimit}&mode=detailed`;
-    if (agencyIds) {
-      url += `&lsp__id=${agencyIds}`;
-    }
-    
-    const res = await fetch(url, { headers: { 'User-Agent': 'T-Zero/1.0' }, next: { revalidate: 60 } });
-    
-    if (!res.ok) {
-        return NextResponse.json({ error: "Failed to fetch from Space Devs" }, { status: res.status });
-    }
-    
-    const data = await res.json();
-    
-    // Filter out past launches to ensure consistency with the "Next" endpoint
-    const now = new Date().getTime();
-    const upcoming = data.results.filter((l: any) => new Date(l.net).getTime() > now);
-
-    // Return only the requested amount
-    return NextResponse.json(upcoming.slice(0, limit));
+    const params = new URL(request.url).searchParams;
+    const limit = boundedLimit(params.get("limit"), 10);
+    const agencies = params.get("agencyIds")?.split(",").filter(Boolean);
+    const now = Date.now();
+    const data = await upcomingSample();
+    return NextResponse.json(
+      data
+        .filter(
+          (item) =>
+            Date.parse(item.net) > now &&
+            (!agencies?.length ||
+              agencies.includes(String(item.launch_service_provider.id)))
+        )
+        .slice(0, limit)
+    );
   } catch (error) {
-    console.error("API Error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    const status = error instanceof LaunchSourceError ? error.status : 502;
+    return NextResponse.json(
+      {
+        error:
+          status === 429
+            ? "The launch provider is rate-limited. Please try again later."
+            : "Launch source temporarily unavailable",
+      },
+      { status }
+    );
   }
 }

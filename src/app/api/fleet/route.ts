@@ -19,7 +19,7 @@ export async function GET() {
     try {
         const promises = ROCKET_IDS.map(async (id) => {
             try {
-                 const res = await fetch(`${BASE_URLS.SPACE_DEVS}/config/launcher/${id}/`, { headers: { 'User-Agent': 'T-Zero/1.0' }, next: { revalidate: 86400 } });
+                 const res = await fetch(`${BASE_URLS.SPACE_DEVS}/config/launcher/${id}/`, { signal: AbortSignal.timeout(15000), headers: { 'User-Agent': 'T-Zero/1.0' }, next: { revalidate: 86400 } });
                  if(!res.ok) return null;
                  return res.json();
             } catch (e) {
@@ -30,6 +30,7 @@ export async function GET() {
 
         const results = await Promise.all(promises);
         const fleet = results.filter((r) => r !== null);
+        if (!fleet.length) return NextResponse.json({ error: "Fleet source unavailable" }, { status: 502 });
         return NextResponse.json(fleet);
     } catch (error) {
         console.error("Fleet API Error:", error);

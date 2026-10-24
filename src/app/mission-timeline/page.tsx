@@ -1,108 +1,240 @@
 "use client";
-
-import { useEffect, useState, Suspense } from "react";
-import { getRecentLaunches, Launch } from "@/lib/api";
-import { LoadingList } from "@/components/Loading";
-
-function TimelineContent() {
-  const [launches, setLaunches] = useState<Launch[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const data = await getRecentLaunches(30);
-        setLaunches(data);
-      } catch (e) {
-        console.error("Failed to load timeline data", e);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
-
-  if (loading) {
-      return <LoadingList />;
-  }
-
-  // Group launches by year
-  const launchesByYear = launches.reduce((acc, launch) => {
-    const year = new Date(launch.net).getFullYear();
-    if (!acc[year]) acc[year] = [];
-    acc[year].push(launch);
-    return acc;
-  }, {} as Record<number, Launch[]>);
-
-  // Sort years descending
-  const years = Object.keys(launchesByYear).map(Number).sort((a, b) => b - a);
-
+import { Suspense, useState } from "react";
+import { ArrowUpRight, ChevronRight, Clock3 } from "lucide-react";
+import type { Launch } from "@/lib/api";
+import {
+  DataState,
+  ExplorerShell,
+  SearchField,
+  SourceNote,
+  dateLabel,
+  outcome,
+  useFilters,
+  useRemote,
+} from "@/components/ExplorerKit";
+import { MissionBrief, useSavedMissions } from "@/components/MissionBrief";
+const milestones = [
+  {
+    year: "1957",
+    title: "The space age begins.",
+    description:
+      "Sputnik 1 becomes the first artificial satellite to orbit Earth.",
+    category: "Earth orbit",
+    link: "https://www.nasa.gov/history/sputnik/",
+  },
+  {
+    year: "1969",
+    title: "One giant leap.",
+    description: "Apollo 11 brings humanity to the surface of the Moon.",
+    category: "Lunar exploration",
+    link: "https://www.nasa.gov/mission/apollo-11/",
+  },
+  {
+    year: "1998",
+    title: "A home above Earth.",
+    description:
+      "The first element of the International Space Station launches, beginning an extraordinary international collaboration.",
+    category: "Living in space",
+    link: "https://www.nasa.gov/international-space-station/",
+  },
+  {
+    year: "2021",
+    title: "A new window on the universe.",
+    description:
+      "The James Webb Space Telescope launches on a journey to study the earliest galaxies and distant worlds.",
+    category: "Deep space",
+    link: "https://science.nasa.gov/mission/webb/",
+  },
+];
+function Content() {
+  const { data, loading, error, retry, updated } = useRemote<Launch>(
+    "/api/launches/recent?limit=100"
+  );
+  const { params, set, reset } = useFilters();
+  const [selected, setSelected] = useState<Launch | null>(null);
+  const { saved, toggle } = useSavedMissions();
+  const tab = params.get("tab") === "milestones" ? "milestones" : "recent";
+  const q = params.get("q") || "",
+    agency = params.get("agency") || "",
+    status = params.get("status") || "";
+  const launches = data.filter(
+    (item) =>
+      (!q || item.name.toLowerCase().includes(q.toLowerCase())) &&
+      (!agency || item.launch_service_provider.name === agency) &&
+      (!status || outcome(item.status.abbrev) === status)
+  );
   return (
-    <div className="relative border-l border-white/10 ml-4 md:ml-0 space-y-12">
-        {/* Timeline Items */}
-        {years.map((year) => (
-             <div key={year} className="mb-12">
-                 <div className="sticky top-24 z-10 bg-slate-950 py-2 mb-4">
-                    <span className="text-2xl font-bold text-blue-400">{year}</span>
-                 </div>
-                 
-                 <div className="space-y-8 pl-8 md:pl-12 relative">
-                    {launchesByYear[year].map((launch) => {
-                        const launchDate = new Date(launch.net);
-                        const isSuccess = launch.status.abbrev === "Success";
-                        const isFailure = launch.status.abbrev === "Failure";
-                        
-                        return (
-                         <div key={launch.id} className="relative group">
-                            <div className={`absolute -left-[45px] md:-left-[61px] top-2 h-6 w-6 rounded-full bg-slate-900 border-2 z-20 ${isSuccess ? 'border-emerald-500' : isFailure ? 'border-red-500' : 'border-blue-500'}`} />
-                            <div className="rounded-2xl bg-white/5 p-6 border border-white/10 hover:bg-white/10 transition-colors">
-                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-                                    <div>
-                                        <div className="flex items-center gap-2 text-sm text-blue-400 mb-1">
-                                            <span>{launchDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
-                                            <span className="text-gray-600">•</span>
-                                            <span className="text-gray-400">{launchDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>
-                                        </div>
-                                        <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">
-                                            {launch.mission?.name || launch.name}
-                                        </h3>
-                                        <div className="text-sm text-gray-400 mt-1">{launch.launch_service_provider.name} • {launch.rocket.configuration.name}</div>
-                                    </div>
-                                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset w-fit ${
-                                        isSuccess ? 'bg-emerald-400/10 text-emerald-400 ring-emerald-400/20' : 
-                                        isFailure ? 'bg-red-400/10 text-red-400 ring-red-400/20' : 
-                                        'bg-blue-400/10 text-blue-400 ring-blue-400/20'
-                                    }`}>
-                                        {launch.status.name}
-                                    </span>
-                                </div>
-                                <p className="text-gray-400 text-sm leading-relaxed">
-                                    {launch.mission?.description || "No mission description available."}
-                                </p>
-                                {launch.pad && (
-                                    <div className="mt-4 pt-4 border-t border-white/5 text-xs text-gray-500">
-                                        Launched from {launch.pad.name}, {launch.pad.location.name}
-                                    </div>
-                                )}
-                            </div>
-                         </div>
-                    )})}
-                 </div>
-             </div>
-        ))}
-    </div>
-  )
-}
-
-export default function MissionTimeline() {
-  return (
-    <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12">
-      <h1 className="text-3xl font-bold tracking-tight text-white mb-8">Mission Timeline</h1>
-      <Suspense fallback={<LoadingList />}>
-          <TimelineContent />
-      </Suspense>
-    </div>
+    <ExplorerShell
+      title="Mission History"
+      eyebrow="LOOK BACK. LOOK FURTHER."
+      description="The missions that brought us here, and the moments that changed everything."
+    >
+      <div className="history-intro">
+        <span className="eyebrow">HUMAN CURIOSITY, WITHOUT LIMITS</span>
+        <h2>
+          Every giant leap
+          <br />
+          starts with a question.
+        </h2>
+        <span className="history-year">
+          1957 <span>→</span> NOW
+        </span>
+      </div>
+      <div className="section-tabs">
+        <button
+          className={tab === "recent" ? "active" : ""}
+          onClick={() => set("tab", "")}
+        >
+          Recent missions <span>{data.length || "—"}</span>
+        </button>
+        <button
+          className={tab === "milestones" ? "active" : ""}
+          onClick={() => set("tab", "milestones")}
+        >
+          Exploration milestones <span>04</span>
+        </button>
+      </div>
+      {tab === "milestones" ? (
+        <>
+          <div className="milestone-list">
+            {milestones.map((item, index) => (
+              <article key={item.year}>
+                <div className="milestone-year">
+                  <span className="eyebrow">
+                    CHAPTER {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <strong>{item.year}</strong>
+                </div>
+                <div>
+                  <span className="eyebrow">{item.category}</span>
+                  <h2>{item.title}</h2>
+                  <p>{item.description}</p>
+                  <a href={item.link} target="_blank" rel="noreferrer">
+                    Explore the story at NASA <ArrowUpRight size={14} />
+                  </a>
+                </div>
+                <span className="milestone-orbit" aria-hidden="true" />
+              </article>
+            ))}
+          </div>
+          <SourceNote updated={null}>
+            Curated historical milestones · NASA · A selection, not an
+            exhaustive history.
+          </SourceNote>
+        </>
+      ) : (
+        <>
+          <div className="filter-toolbar">
+            <SearchField
+              value={q}
+              onChange={(value) => set("q", value)}
+              placeholder="Search recent missions"
+            />
+            <label className="sr-only" htmlFor="history-agency">
+              Launch provider
+            </label>
+            <select
+              id="history-agency"
+              value={agency}
+              onChange={(event) => set("agency", event.target.value)}
+            >
+              <option value="">All providers</option>
+              {[
+                ...new Set(
+                  data.map((item) => item.launch_service_provider.name)
+                ),
+              ]
+                .sort()
+                .map((name) => (
+                  <option key={name}>{name}</option>
+                ))}
+            </select>
+            <label className="sr-only" htmlFor="history-outcome">
+              Outcome
+            </label>
+            <select
+              id="history-outcome"
+              value={status}
+              onChange={(event) => set("status", event.target.value)}
+            >
+              <option value="">All outcomes</option>
+              <option value="success">Success</option>
+              <option value="failure">Failure</option>
+              <option value="partial">Partial failure</option>
+              <option value="other">Other / pending</option>
+            </select>
+            {(q || agency || status) && (
+              <button className="quiet-button" onClick={reset}>
+                Clear filters
+              </button>
+            )}
+          </div>
+          <div className="results-caption">
+            {launches.length} missions · Recent source sample · UTC dates
+          </div>
+          <DataState
+            loading={loading}
+            error={error}
+            empty={!launches.length}
+            retry={retry}
+          />
+          {!loading && !error && (
+            <div className="history-timeline">
+              {launches.map((launch) => (
+                <button
+                  className="history-entry"
+                  key={launch.id}
+                  onClick={() => setSelected(launch)}
+                >
+                  <span className="history-date">
+                    <Clock3 size={13} />
+                    {dateLabel(launch.net)}
+                  </span>
+                  <div>
+                    <span className="eyebrow">
+                      {launch.launch_service_provider.name}
+                    </span>
+                    <h3>{launch.mission?.name || launch.name}</h3>
+                    <p>
+                      {launch.rocket.configuration.name} ·{" "}
+                      {launch.pad.location.name}
+                    </p>
+                  </div>
+                  <span
+                    className={`outcome-badge ${outcome(launch.status.abbrev)}`}
+                  >
+                    {launch.status.name}
+                  </span>
+                  <ChevronRight size={15} />
+                </button>
+              ))}
+            </div>
+          )}
+          <SourceNote updated={updated}>
+            Up to 100 recent launches from The Space Devs. This is a bounded
+            recent sample, not the full historical archive.
+          </SourceNote>
+        </>
+      )}
+      <MissionBrief
+        launch={selected}
+        onClose={() => setSelected(null)}
+        saved={!!selected && saved.includes(selected.id)}
+        onSave={() => {
+          if (selected) toggle(selected.id);
+        }}
+      />
+    </ExplorerShell>
   );
 }
-
-
+export default function History() {
+  return (
+    <Suspense
+      fallback={
+        <div className="explorer-loading">Preparing mission history…</div>
+      }
+    >
+      <Content />
+    </Suspense>
+  );
+}

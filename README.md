@@ -105,3 +105,29 @@ The Android application is a "Hybrid App". It runs the frontend locally on the d
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Orbital Command redesign
+
+The app now includes the mission-control overview, URL-backed launch search and provider/status filters, UTC list/calendar views, local bookmarks, fleet comparisons, a three-model NASA heritage collection, component focus controls, an educational Saturn V staging diagram, historical milestones, recent-launch analytics, and CSV export. See `DESIGN_PLAN.md` for scope and validation details and `public/models/ATTRIBUTION.md` for model provenance.
+
+### Verification
+
+```powershell
+npm test
+npx tsc --noEmit
+npm run build
+```
+
+### Updated Android frontend workflow
+
+API routes run on your deployed Next.js backend. Build the static WebView frontend using:
+
+```powershell
+$env:NEXT_PUBLIC_API_URL = 'https://your-tzero-backend.example'
+npm run build:android
+npx cap sync android
+```
+
+`build:android` excludes server-only routes during export and restores them afterward. It requires an HTTPS backend origin. `npm run check:android` validates export with a deliberately unusable placeholder backend; that output is not a release build. If an interrupted build leaves `.android-build-api`, restore it to `src/app/api` before continuing.
+
+Compiling an APK requires the Capacitor 8 Android toolchain, JDK 21, and an Android SDK with API 36. Physical GPU smoothness, TalkBack, and device power usage must be checked on actual Android hardware.

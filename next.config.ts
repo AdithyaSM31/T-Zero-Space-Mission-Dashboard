@@ -6,6 +6,7 @@ const isAndroid = process.env.BUILD_TARGET === 'android';
 const nextConfig: NextConfig = {
   // Only use static export for Android build
   ...(isAndroid ? { output: 'export' } : {}),
+  ...(isAndroid ? { typescript: { tsconfigPath: 'tsconfig.android.json' } } : {}),
   images: {
     unoptimized: true,
   },

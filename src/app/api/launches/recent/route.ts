@@ -1,23 +1,26 @@
 import { NextResponse } from "next/server";
-
-const BASE_URLS = {
-  SPACE_DEVS: "https://ll.thespacedevs.com/2.2.0",
-};
-
+import {
+  boundedLimit,
+  LaunchSourceError,
+  recentSample,
+} from "@/lib/launch-source";
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const limit = searchParams.get('limit') || '20';
-
-    const res = await fetch(`${BASE_URLS.SPACE_DEVS}/launch/previous/?limit=${limit}&mode=detailed`, { headers: { 'User-Agent': 'T-Zero/1.0' }, next: { revalidate: 3600 } });
-    
-    if (!res.ok) {
-      return NextResponse.json({ error: "Failed to fetch recent launches" }, { status: res.status });
-    }
-    const data = await res.json();
-    return NextResponse.json(data.results);
+    const limit = boundedLimit(
+      new URL(request.url).searchParams.get("limit"),
+      20
+    );
+    return NextResponse.json((await recentSample()).slice(0, limit));
   } catch (error) {
-    console.error("API Error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    const status = error instanceof LaunchSourceError ? error.status : 502;
+    return NextResponse.json(
+      {
+        error:
+          status === 429
+            ? "The launch provider is rate-limited. Please try again later."
+            : "Launch source temporarily unavailable",
+      },
+      { status }
+    );
   }
 }

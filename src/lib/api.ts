@@ -14,6 +14,7 @@ export interface Launch {
     abbrev: string;
   };
   net: string; // No Earliest Launch Time
+  net_precision?: { name: string; abbrev: string };
   window_start: string;
   window_end: string;
   launch_service_provider: {
