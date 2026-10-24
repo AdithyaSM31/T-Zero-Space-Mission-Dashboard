@@ -47,8 +47,8 @@ const heritage = [
     detail:
       "A NASA design study from the Constellation program. This asset represents a historical concept, not an operational vehicle.",
     source:
-      "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Ares%201%20(A)",
-    credit: "NASA 3D Resources",
+      "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Ares%201%20(B)",
+    credit: "NASA / Michael D. Carbajal",
   },
 ];
 function value(number: number | null | undefined, unit = "") {
@@ -156,7 +156,7 @@ function Content() {
               ) : (
                 <div className="model-launch">
                   <img
-                    src={`/models/${asset.slug}.png`}
+                    src={`/models/${asset.slug}.png?materials=4`}
                     alt={`${asset.name} NASA 3D model preview`}
                   />
                   <button

@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 export default function RocketViewer({
   slug,
   name,
@@ -58,6 +59,11 @@ export default function RocketViewer({
     camera.position.set(0, 0, 8.5);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    const restoredFinish = slug === "atlas-mercury" || slug === "ares-i";
+    if (restoredFinish) {
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.15;
+    }
     renderer.setClearColor(0x000000, 0);
     element.appendChild(renderer.domElement);
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -74,8 +80,27 @@ export default function RocketViewer({
     controls.autoRotate = !motion.matches && initialFocus === "all";
     setPaused(!controls.autoRotate);
     controls.autoRotateSpeed = 0.8;
-    scene.add(new THREE.HemisphereLight(0xd9f1ff, 0x263842, 3));
-    const light = new THREE.DirectionalLight(0xffffff, 3);
+    const environmentGenerator = restoredFinish
+      ? new THREE.PMREMGenerator(renderer)
+      : null;
+    const studio = restoredFinish ? new RoomEnvironment() : null;
+    const environment =
+      studio && environmentGenerator
+        ? environmentGenerator.fromScene(studio, 0.04)
+        : null;
+    if (environment) {
+      scene.environment = environment.texture;
+      scene.environmentIntensity = 0.7;
+    }
+    studio?.dispose();
+    environmentGenerator?.dispose();
+    scene.add(
+      new THREE.HemisphereLight(0xd9f1ff, 0x263842, restoredFinish ? 1.25 : 3)
+    );
+    const light = new THREE.DirectionalLight(
+      0xffffff,
+      restoredFinish ? 2.4 : 3
+    );
     light.position.set(-3, 4, 5);
     scene.add(light);
     const rim = new THREE.DirectionalLight(0x74d7ee, 2);
@@ -97,7 +122,7 @@ export default function RocketViewer({
       });
     const draco = new DRACOLoader().setDecoderPath("/draco/").setWorkerLimit(1);
     new GLTFLoader().setDRACOLoader(draco).load(
-      `/models/${slug}.glb`,
+      `/models/${slug}.glb${restoredFinish ? "?materials=3" : ""}`,
       (gltf) => {
         if (disposed) {
           release(gltf.scene);
@@ -116,6 +141,8 @@ export default function RocketViewer({
         model.updateMatrixWorld(true);
         box = new THREE.Box3().setFromObject(model);
         model.position.sub(box.getCenter(new THREE.Vector3()));
+        // Reserve a small clear band below the model for the floating controls.
+        if (restoredFinish) model.position.y += 0.18;
         scene.add(model);
         setState("ready");
       },
@@ -171,6 +198,7 @@ export default function RocketViewer({
       draco.dispose();
       control.current = null;
       release(scene);
+      environment?.dispose();
       renderer.dispose();
       renderer.domElement.remove();
     };
@@ -196,7 +224,10 @@ export default function RocketViewer({
       />
       {state !== "ready" && (
         <div className="model-poster">
-          <img src={`/models/${slug}.png`} alt={`${name} NASA model preview`} />
+          <img
+            src={`/models/${slug}.png?materials=4`}
+            alt={`${name} NASA model preview`}
+          />
           <span>
             {state === "loading"
               ? "Preparing 3D model…"
