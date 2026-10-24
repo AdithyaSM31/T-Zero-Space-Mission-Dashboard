@@ -1,133 +1,162 @@
-# T-Zero: Space Mission Dashboard
-
 <p align="center">
-  <img src="logo.png" alt="T-Zero Logo" width="150" height="150" />
+  <img src="public/brand/tzero-logo.png" alt="T-Zero orbital monogram" width="160" />
 </p>
 
-**The New Era of Space Exploration**
+<h1 align="center">T–ZERO</h1>
+<p align="center"><strong>A bigger perspective on space exploration.</strong></p>
+<p align="center">Explore upcoming launches, discover the machines behind them, and follow humanity beyond Earth.</p>
 
-Your unified command center for the modern space race. Track real-time missions, analyze launch data, and witness humanity's journey to the stars.
-
-T-Zero is a unified, real-time space mission dashboard that aggregates data from different space agencies into one accessible platform.
-
-## Features
-
-- **Launch Center**: Real-time countdowns and upcoming mission tracking.
-- **Fleet Explorer**: Interactive comparison of rockets from SpaceX, NASA, and ISRO.
-- **Mission Timeline**: Historical view of humanity's space journey.
-- **Analytics Hub**: Comparative analytics and success metrics.
-- **Mobile App**: Android APK support via Capacitor.
-
-## Tech Stack
-
-- **Framework**: [Next.js](https://nextjs.org) (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Animations**: Framer Motion
-- **Icons**: Lucide React
-- **Charts**: Recharts
-- **Mobile**: Capacitor (Android)
-
-## Getting Started
-
-1.  **Install dependencies:**
-
-    ```bash
-    npm install
-    ```
-
-2.  **Run the development server:**
-
-    ```bash
-    npm run dev
-    ```
-
-3.  Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-## Building for Android
-
-The Android application is a "Hybrid App". It runs the frontend locally on the device (via Capacitor) but fetches data from your deployed Next.js API.
-
-### Prerequisites
-- Android Studio
-- JDK 21+ installed
-- A deployed version of this repo (e.g., on Vercel) to serve the API.
-
-### Build Steps
-
-1.  **Deploy Backend**:
-    Push this repository to GitHub and deploy to Vercel. This ensures the API endpoints (`/api/...`) are live and accessible over the internet.
-    *Note: The project includes CORS configuration in `next.config.ts` to allow the Android app to talk to Vercel.*
-
-2.  **Generate Mobile Assets (Icons/Splash)**:
-    If you change `assets/logo.png`, regenerate the icons:
-    ```bash
-    npx @capacitor/assets generate --iconBackgroundColor '#020617' --splashBackgroundColor '#020617' --android
-    ```
-
-3.  **Build Static Frontend**:
-    Run the build with the Android target flag. Replace `NEXT_PUBLIC_API_URL` with your **actual Vercel Deployment URL**.
-    ```bash
-    # Windows (PowerShell)
-    $env:NEXT_PUBLIC_API_URL='https://your-project.vercel.app'; $env:BUILD_TARGET='android'; npm run build
-    
-    # Mac/Linux
-    NEXT_PUBLIC_API_URL='https://your-project.vercel.app' BUILD_TARGET=android npm run build
-    ```
-    *Note: `next build` might warn about headers being ignored for static export. This is expected—the headers are for the Vercel deployment, not the static Android files.*
-
-4.  **Sync Capacitor**:
-    Copy the build assets to the Android project.
-    ```bash
-    npx cap sync
-    ```
-
-5.  **Compile APK**:
-    Open the `android` folder in **Android Studio** and click **Run** or **Build > Build Bundle(s) / APK(s)**.
-
-## Project Structure
-
-- `src/app`: Page routes and layouts.
-- `src/components`: Reusable UI components.
-- `src/lib`: Utility functions and API SDK.
-- `android`: Native Android project files.
-- `assets`: Source files for app icons and splash screens.
-
-
-- 3D visualizations of rockets.
+<p align="center">
+  <a href="#a-look-inside">Screenshots</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#run-locally">Run locally</a> ·
+  <a href="#android">Android</a> ·
+  <a href="public/models/ATTRIBUTION.md">Asset credits</a>
+</p>
 
 ---
 
-*"Ensuring peace and sustainability in the final frontier."*
+T-Zero is a space mission dashboard built around an interactive Earth, source-backed launch schedules, and a hands-on 3D heritage collection. A dark mission-control interface, mint accents, and restrained motion bring the experience together across desktop and mobile.
 
-## Deploy on Vercel
+## A look inside
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Your orbital overview
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+An interactive Earth connects each mission to its launch site, with mission details, UTC/local time, bookmarks, and countdowns when the source provides sufficient time precision.
 
-## Orbital Command redesign
+![T-Zero overview with interactive Earth and featured mission](docs/images/overview.png)
 
-The app now includes the mission-control overview, URL-backed launch search and provider/status filters, UTC list/calendar views, local bookmarks, fleet comparisons, a three-model NASA heritage collection, component focus controls, an educational Saturn V staging diagram, historical milestones, recent-launch analytics, and CSV export. See `DESIGN_PLAN.md` for scope and validation details and `public/models/ATTRIBUTION.md` for model provenance.
+_Screenshots capture the app at a point in time. Mission schedules, counts, and countdowns will change as the source updates._
 
-### Verification
+### Get closer to the machines
 
-```powershell
+Rotate NASA-sourced models, focus on their upper and lower sections, and explore an educational Saturn V stage-separation diagram.
+
+![NASA heritage collection with the Saturn V model and component controls](docs/images/fleet-explorer.png)
+
+|                                          Friendship 7                                          |                                       Ares I                                        |
+| :--------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------: |
+| ![Friendship 7 capsule with restored visualization materials](public/models/atlas-mercury.png) | ![Ares I with NASA color materials and corrected framing](public/models/ares-i.png) |
+|                 NASA capsule geometry with reference-based restored finishes.                  |  NASA's colored historical concept model, with stray duplicate fragments removed.   |
+
+### The moments that brought us here
+
+Browse recent launches or revisit selected milestones, from the beginning of the space age to new views of the universe.
+
+![Mission History showing curated exploration milestones](docs/images/mission-history.png)
+
+## Features
+
+| Experience                 | What you can do                                                                                                                                   |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Orbital overview**       | Rotate Earth, locate a selected launch site, inspect a mission, switch UTC/local time, and save missions on your device.                          |
+| **Launch Center**          | Search missions, filter providers and statuses, view saved missions, and switch between list and monthly calendar views. Filters live in the URL. |
+| **Fleet Explorer**         | Browse vehicle photos and specifications, filter manufacturers, and compare two rockets using a specification table and common-scale height bars. |
+| **NASA 3D collection**     | Explore Saturn V, the Friendship 7 capsule, and an Ares I concept with rotate, pause, zoom, reset, and component-focus controls.                  |
+| **Mission History**        | Filter a recent-launch timeline and explore four curated, NASA-linked historical milestones.                                                      |
+| **Analytics**              | Filter a recent sample by provider and date, inspect launch activity and outcomes, read accessible chart data, and export CSV.                    |
+| **Mobile & accessibility** | Use responsive bottom navigation, keyboard-accessible controls, reduced-motion support, and static model previews when WebGL is unavailable.      |
+| **Android**                | Export the frontend for the existing Capacitor Android project, with a separately deployed API backend.                                           |
+
+### Data, with context
+
+- Launch schedules and modern fleet specifications come from [The Space Devs](https://thespacedevs.com/llapi).
+- Schedules can change. Month- or year-only estimates are not pinned to individual calendar days, and precise countdowns require minute or second precision.
+- History and analytics use **up to 100 recent records**, not the complete historical archive. Coverage dates and the outcome denominator are displayed in the app.
+- Shared normalized caching reduces repeated provider requests. Unavailable, empty, loading, and rate-limited states are explicit.
+- Saved missions are stored in the current browser/device; no account is required.
+- The 3D collection is a heritage collection. Friendship 7 depicts the capsule, and Ares I is labeled as a historical concept. Models and the staging diagram are visual references, not engineering simulations.
+
+## Built with
+
+**Next.js App Router · React · TypeScript · Tailwind CSS · Three.js · Framer Motion · Recharts · Lucide · Capacitor**
+
+GLB models and the Draco decoder are served locally. WebGL scenes load on demand, cap rendering resolution, and skip rendering while hidden. Reduced-motion preferences disable automatic rotation.
+
+## Run locally
+
+Use Node.js **22.18 or newer** to match the built-in TypeScript test runner.
+
+```bash
+git clone https://github.com/AdithyaSM31/T-Zero-Space-Mission-Dashboard.git
+cd T-Zero-Space-Mission-Dashboard
+npm install
+npm run dev
+```
+
+Open [localhost:3000](http://localhost:3000). The web app uses its own Next.js API routes by default, so no API URL is needed for ordinary local development. Network access to the launch provider is required for current schedules; the labeled design preview and bundled heritage assets remain available independently.
+
+### Checks and production build
+
+```bash
 npm test
 npx tsc --noEmit
 npm run build
+npm start
 ```
 
-### Updated Android frontend workflow
+Tests cover outcome calculations, calendar date precision, preserved capsule geometry, distinct model materials, and Ares I scene cleanup.
 
-API routes run on your deployed Next.js backend. Build the static WebView frontend using:
+## Android
 
-```powershell
-$env:NEXT_PUBLIC_API_URL = 'https://your-tzero-backend.example'
-npm run build:android
-npx cap sync android
+The Android frontend runs inside Capacitor and requests schedules from your deployed Next.js backend. Compile an APK with **JDK 21**, **Android SDK API 36**, and Android Studio.
+
+1. Deploy the Next.js app so its `/api` endpoints are reachable over HTTPS.
+2. Set your actual backend origin and export the frontend:
+
+   ```powershell
+   $env:NEXT_PUBLIC_API_URL = 'https://your-project.vercel.app'
+   npm run build:android
+   npx cap sync android
+   npx cap open android
+   ```
+
+3. Build and run the app in Android Studio.
+
+`build:android` temporarily excludes server-only routes from static export and restores them afterward. If a process is forcibly interrupted and leaves `.android-build-api`, restore that directory to `src/app/api` before retrying.
+
+To validate static export without a deployed backend:
+
+```bash
+npm run check:android
 ```
 
-`build:android` excludes server-only routes during export and restores them afterward. It requires an HTTPS backend origin. `npm run check:android` validates export with a deliberately unusable placeholder backend; that output is not a release build. If an interrupted build leaves `.android-build-api`, restore it to `src/app/api` before continuing.
+This check uses a deliberately unusable placeholder API origin; its output is **not a release build**. Physical-device GPU performance, TalkBack, and battery usage require device testing.
 
-Compiling an APK requires the Capacitor 8 Android toolchain, JDK 21, and an Android SDK with API 36. Physical GPU smoothness, TalkBack, and device power usage must be checked on actual Android hardware.
+## Brand & visual assets
+
+The new T-Zero mark combines a **T**, an orbital **zero**, and a navigation star. The app, favicon, README, and Android assets share the same mint-and-ice identity.
+
+- [Production logo](public/brand/tzero-logo.png) · [High-resolution master](public/brand/tzero-logo-master.png)
+- [Brand notes and generation prompt](public/brand/README.md)
+- [NASA models, Earth imagery, and decoder attribution](public/models/ATTRIBUTION.md)
+
+Regenerate logo sizes and Android artwork from the checked-in master:
+
+```bash
+node scripts/generate-brand-assets.cjs
+npx capacitor-assets generate --android --iconBackgroundColor '#080c12' --splashBackgroundColor '#080c12'
+```
+
+## Project map
+
+```text
+src/app/              Routes, shared layout, styles, and API endpoints
+src/components/       Mission UI, charts, Earth, and model viewers
+src/lib/              Data types, normalized source caching, and metrics
+public/brand/         Logo master, app-size exports, and brand notes
+public/models/        NASA heritage assets, previews, and attribution
+public/draco/         Local model decoder and license
+public/textures/      Earth surface texture
+docs/images/          Current README screenshots
+assets/               Android logo and splash sources
+android/              Capacitor Android project
+scripts/              Android export, brand generation, and model repairs
+tests/                Metrics and model regression tests
+```
+
+See [the implementation notes](DESIGN_PLAN.md) for design decisions and validation scope.
+
+---
+
+<p align="center"><strong>One planet. Infinite possibilities.</strong><br/>Built for the curious.</p>

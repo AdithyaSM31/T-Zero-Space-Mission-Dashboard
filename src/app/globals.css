@@ -3552,3 +3552,24 @@ thead {
 .heritage-canvas canvas:active {
   cursor: grabbing;
 }
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+.wordmark {
+  gap: 9px;
+}
+@media (max-width: 1200px) {
+  .brand-mark {
+    width: 33px;
+    height: 33px;
+  }
+}
+@media (max-width: 960px) {
+  .brand-mark {
+    width: 38px;
+    height: 38px;
+  }
+}
