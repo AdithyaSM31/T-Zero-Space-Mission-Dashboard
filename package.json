@@ -8,8 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
-    "build:android": "node scripts/build-android.mjs",
-    "check:android": "node scripts/build-android.mjs --check"
+    "build:android": "node scripts/build-native-android.cjs",
+    "check:android": "node scripts/build-native-android.cjs --test",
+    "test:android:device": "node scripts/build-native-android.cjs --connected",
+    "export:legacy-android-web": "node scripts/build-android.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.2",

@@ -20,9 +20,11 @@
 - Browser checks: live upcoming schedule loaded 98 missions; fleet loaded eight configurations; analytics/history loaded 100 recent missions. Tested calendar switching, retry recovery, URL-backed comparison selections, mission navigation, CSV download, and NASA model loading. Provider throttling occurred during later checks; it is surfaced explicitly.
 - Desktop and mobile CSS layouts inspected in the browser. Actual GPU frame pacing, battery use, TalkBack, and device WebView behavior require physical hardware.
 
-## Remaining environment-dependent validation
+## Native Android v1.1
 
-The machine has JDK 17 and no detected Android SDK. Building an APK requires JDK 21 and Android SDK API 36 for this Capacitor 8 project. A release static frontend also needs the actual deployed HTTPS API origin. No APK, physical-device performance result, or screen-reader certification is claimed.
+The Android project is now a native Kotlin/Jetpack Compose app with Filament rendering, retaining package com.tzero.app and version 1.1.0 (code 2). The installed API 36 SDK is configured locally; JDK 17 builds the native project. No Capacitor runtime or web backend is required. See android/README.md for build and release details. Physical-device performance, battery use, and TalkBack remain hardware validation work.
+
+The v1.1 debug APK builds successfully. Five JVM unit tests and all three Android device tests pass using the host GPU: navigation, all three heritage models, and Earth loading/orbit/reset. Earth framing was visually inspected after correcting the origin/camera target and switching to a transparent viewport. The software emulator renderer cannot compile Filament post-processing shaders; host GPU rendering works. The installable debug APK is packaged locally in releases/android; physical-device performance and accessibility validation remain before release.
 
 ## Local development
 
@@ -30,9 +32,9 @@ Run `npm install`, `npm run dev`, then open the printed local URL.
 
 Checks: `npm test`, `npx tsc --noEmit`, `npm run build`.
 
-Android export check: `npm run check:android`.
+Native Android check: `npm run check:android`.
 
-Android release frontend: set `NEXT_PUBLIC_API_URL` to the deployed HTTPS API origin, run `npm run build:android`, then `npx cap sync android`.
+Native Android test APK: `npm run build:android`. Do not run Capacitor sync against the native project.
 
 ## Asset provenance
 

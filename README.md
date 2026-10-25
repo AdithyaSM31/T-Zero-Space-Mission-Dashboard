@@ -56,7 +56,7 @@ Browse recent launches or revisit selected milestones, from the beginning of the
 | **Mission History**        | Filter a recent-launch timeline and explore four curated, NASA-linked historical milestones.                                                      |
 | **Analytics**              | Filter a recent sample by provider and date, inspect launch activity and outcomes, read accessible chart data, and export CSV.                    |
 | **Mobile & accessibility** | Use responsive bottom navigation, keyboard-accessible controls, reduced-motion support, and static model previews when WebGL is unavailable.      |
-| **Android**                | Export the frontend for the existing Capacitor Android project, with a separately deployed API backend.                                           |
+| **Android**                | Use the native Kotlin/Compose app with on-device Filament 3D, cached data, local bookmarks, and direct HTTPS source access.                       |
 
 ### Data, with context
 
@@ -69,7 +69,9 @@ Browse recent launches or revisit selected milestones, from the beginning of the
 
 ## Built with
 
-**Next.js App Router · React · TypeScript · Tailwind CSS · Three.js · Framer Motion · Recharts · Lucide · Capacitor**
+**Web:** Next.js App Router · React · TypeScript · Tailwind CSS · Three.js · Framer Motion · Recharts · Lucide
+
+**Android v1.1:** Kotlin · Jetpack Compose · Material 3 · Filament · Coroutines · Lifecycle
 
 GLB models and the Draco decoder are served locally. WebGL scenes load on demand, cap rendering resolution, and skip rendering while hidden. Reduced-motion preferences disable automatic rotation.
 
@@ -99,29 +101,35 @@ Tests cover outcome calculations, calendar date precision, preserved capsule geo
 
 ## Android
 
-The Android frontend runs inside Capacitor and requests schedules from your deployed Next.js backend. Compile an APK with **JDK 21**, **Android SDK API 36**, and Android Studio.
+**T-Zero v1.1 is now a native Kotlin + Jetpack Compose app.** The Android project uses native screens and Google's Filament renderer for Earth and spacecraft models. Its package is `com.tzero.app`, version `1.1.0` (code `2`).
 
-1. Deploy the Next.js app so its `/api` endpoints are reachable over HTTPS.
-2. Set your actual backend origin and export the frontend:
+[Download the v1.1.0 Android test APK](https://github.com/AdithyaSM31/T-Zero-Space-Mission-Dashboard/releases/tag/v1.1.0). This prerelease is debug-signed and includes a SHA-256 checksum. It requires Android 7.0 or newer. Updating an existing installation requires a matching signing key.
 
-   ```powershell
-   $env:NEXT_PUBLIC_API_URL = 'https://your-project.vercel.app'
-   npm run build:android
-   npx cap sync android
-   npx cap open android
-   ```
+The native app connects directly to The Space Devs over HTTPS, caches launch data on-device, and bundles its fleet catalog and 3D assets. A deployed Next.js backend or JavaScript bundle is not required for the native app.
 
-3. Build and run the app in Android Studio.
+### Build the native APK
 
-`build:android` temporarily excludes server-only routes from static export and restores them afterward. If a process is forcibly interrupted and leaves `.android-build-api`, restore that directory to `src/app/api` before retrying.
+Install JDK **17**, Android SDK **API 36**, and configure the SDK path in `android/local.properties`. Open the `android/` folder in Android Studio, with JDK 17 selected for Gradle.
 
-To validate static export without a deployed backend:
+From the repository root:
 
 ```bash
+npm run build:android
 npm run check:android
 ```
 
-This check uses a deliberately unusable placeholder API origin; its output is **not a release build**. Physical-device GPU performance, TalkBack, and battery usage require device testing.
+The build wrapper copies the debug-signed test APK to `releases/android/T-Zero-v1.1.0-debug.apk` and writes a SHA-256 checksum. These wrappers run Gradle; building directly from Android Studio does not require Node.js.
+
+Windows, directly with Gradle:
+
+```powershell
+cd android
+.\gradlew.bat :app:assembleDebug :app:testDebugUnitTest
+```
+
+Run emulator/device UI tests with `npm run test:android:device`. Release builds require your own signing key; use the same key as the previous app for installable updates.
+
+See the [native Android guide](android/README.md) for architecture, offline behavior, testing, release signing, and migration details. **Do not run `npx cap sync android` against the native project.** The original web-wrapper export remains only as historical tooling under `npm run export:legacy-android-web`.
 
 ## Brand & visual assets
 
@@ -150,7 +158,7 @@ public/draco/         Local model decoder and license
 public/textures/      Earth surface texture
 docs/images/          Current README screenshots
 assets/               Android logo and splash sources
-android/              Capacitor Android project
+android/              Native Kotlin/Compose Android v1.1 project
 scripts/              Android export, brand generation, and model repairs
 tests/                Metrics and model regression tests
 ```
