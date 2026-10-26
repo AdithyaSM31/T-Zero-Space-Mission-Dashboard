@@ -108,8 +108,8 @@ chunk.writeUInt32LE(0x004e4942, 4);
 const j = {
   asset: { version: "2.0", generator: "T-Zero native Earth asset" },
   scene: 0,
-  scenes: [{ nodes: [0] }],
-  nodes: [{ mesh: 0 }],
+  scenes: [{ nodes: [0, 1] }],
+  nodes: [{ mesh: 0, name: "Earth" }, { mesh: 1, name: "LaunchSiteMarker", scale: [0.014, 0.014, 0.014] }],
   meshes: [
     {
       primitives: [
@@ -120,6 +120,7 @@ const j = {
         },
       ],
     },
+    { primitives: [{ attributes: { POSITION: 0, NORMAL: 1 }, indices: 3, material: 1 }] },
   ],
   buffers: [{ byteLength: bin.length }],
   bufferViews: views,
@@ -157,9 +158,13 @@ const j = {
     {
       pbrMetallicRoughness: {
         baseColorTexture: { index: 0 },
+        baseColorFactor: [0.48, 0.60, 0.72, 1],
         metallicFactor: 0,
-        roughnessFactor: 1,
+        roughnessFactor: 0.8,
       },
+    },
+    {
+      pbrMetallicRoughness: { baseColorFactor: [0.72, 1, 0.93, 1], metallicFactor: 0, roughnessFactor: 1 },
       extensions: { KHR_materials_unlit: {} },
     },
   ],

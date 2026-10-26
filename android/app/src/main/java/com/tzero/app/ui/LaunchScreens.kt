@@ -136,6 +136,8 @@ fun OverviewScreen(
                                                 if (earthReady) "Earth ready" else "Earth loading"
                                         },
                                     onReady = { earthReady = true },
+                                    latitude = featured?.latitude,
+                                    longitude = featured?.longitude,
                                 ) {
                                     failed = true
                                 }

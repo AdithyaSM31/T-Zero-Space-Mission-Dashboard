@@ -101,9 +101,9 @@ Tests cover outcome calculations, calendar date precision, preserved capsule geo
 
 ## Android
 
-**T-Zero v1.1 is now a native Kotlin + Jetpack Compose app.** The Android project uses native screens and Google's Filament renderer for Earth and spacecraft models. Its package is `com.tzero.app`, version `1.1.0` (code `2`).
+**T-Zero v1.1 is now a native Kotlin + Jetpack Compose app.** The Android project uses native screens and Google's Filament renderer for Earth and spacecraft models. Its package is `com.tzero.app`, with the current source at version `1.1.3` (code `5`).
 
-[Download the v1.1.0 Android test APK](https://github.com/AdithyaSM31/T-Zero-Space-Mission-Dashboard/releases/tag/v1.1.0). This prerelease is debug-signed and includes a SHA-256 checksum. It requires Android 7.0 or newer. Updating an existing installation requires a matching signing key.
+[Download the latest v1.1.3 Android APK](https://github.com/AdithyaSM31/T-Zero-Space-Mission-Dashboard/releases/tag/v1.1.3). This optimized, non-debuggable build includes a SHA-256 checksum and uses the same test signing key as the previous downloads. It requires Android 7.0 or newer. Updating an existing installation requires a matching signing key.
 
 The native app connects directly to The Space Devs over HTTPS, caches launch data on-device, and bundles its fleet catalog and 3D assets. A deployed Next.js backend or JavaScript bundle is not required for the native app.
 
@@ -115,10 +115,11 @@ From the repository root:
 
 ```bash
 npm run build:android
+npm run build:android:preview
 npm run check:android
 ```
 
-The build wrapper copies the debug-signed test APK to `releases/android/T-Zero-v1.1.0-debug.apk` and writes a SHA-256 checksum. These wrappers run Gradle; building directly from Android Studio does not require Node.js.
+The build wrapper copies the debug-signed development APK to `releases/android/T-Zero-v1.1.3-debug.apk` and writes a SHA-256 checksum. Use `build:android:preview` for the optimized, non-debuggable test build (`T-Zero-v1.1.3-preview.apk`), which retains the local test signing key. These wrappers run Gradle; building directly from Android Studio does not require Node.js.
 
 Windows, directly with Gradle:
 

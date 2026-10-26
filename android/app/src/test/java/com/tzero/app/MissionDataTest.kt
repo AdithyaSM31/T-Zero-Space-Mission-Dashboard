@@ -7,6 +7,38 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class MissionDataTest {
+    @Test
+    fun launchPadCoordinatesAcceptSourceStringsAndRejectInvalidValues() {
+        val items =
+            DataParser.missions(
+                JSONArray(
+                    """[
+            {"id":"valid","pad":{"latitude":"34.7","longitude":"-120.6"}},
+            {"id":"unknown","pad":{"latitude":null,"longitude":null}},
+            {"id":"invalid","pad":{"latitude":91,"longitude":181}}
+        ]"""
+                )
+            )
+        assertEquals(34.7, items[0].latitude!!, .001)
+        assertEquals(-120.6, items[0].longitude!!, .001)
+        assertNull(items[1].latitude)
+        assertNull(items[1].longitude)
+        assertNull(items[2].latitude)
+        assertNull(items[2].longitude)
+    }
+
+    @Test
+    fun globeMarkerUsesTextureCoordinatesAndRequiresKnownLocation() {
+        assertArrayEquals(floatArrayOf(1f, 0f, 0f), globePoint(0.0, 0.0), .0001f)
+        assertArrayEquals(floatArrayOf(0f, 1f, 0f), globePoint(90.0, 0.0), .0001f)
+        assertArrayEquals(floatArrayOf(0f, 0f, 1f), globePoint(0.0, -90.0), .0001f)
+        val point = globePoint(34.7, -120.6)!!
+        assertTrue(point[0] < 0 && point[1] > 0 && point[2] > 0)
+        assertEquals(1f, point.sumOf { (it * it).toDouble() }.toFloat(), .0001f)
+        assertNull(globePoint(null, null))
+        assertNull(globePoint(Double.NaN, 0.0))
+    }
+
     private fun launch(
         status: String = "Go",
         precision: String = "MIN",

@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -58,6 +59,18 @@ private val destinations =
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TZeroApp(vm: MissionViewModel = viewModel()) {
+    val composeView = LocalView.current
+    DisposableEffect(composeView) {
+        if (android.os.Build.VERSION.SDK_INT >= 35) {
+            composeView.requestedFrameRate = android.view.View.REQUESTED_FRAME_RATE_CATEGORY_HIGH
+        }
+        onDispose {
+            if (android.os.Build.VERSION.SDK_INT >= 35) {
+                composeView.requestedFrameRate =
+                    android.view.View.REQUESTED_FRAME_RATE_CATEGORY_DEFAULT
+            }
+        }
+    }
     val state by vm.state.collectAsStateWithLifecycle()
     var selected by rememberSaveable { mutableIntStateOf(0) }
     BackHandler(selected != 0) { selected = 0 }

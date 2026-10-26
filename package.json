@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "build:android": "node scripts/build-native-android.cjs",
+    "build:android:preview": "node scripts/build-native-android.cjs --optimized",
     "check:android": "node scripts/build-native-android.cjs --test",
     "test:android:device": "node scripts/build-native-android.cjs --connected",
     "export:legacy-android-web": "node scripts/build-android.mjs"

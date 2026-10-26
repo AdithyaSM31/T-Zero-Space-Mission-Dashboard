@@ -23,6 +23,8 @@ data class Mission(
     val image: String,
     val windowStart: String,
     val windowEnd: String,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
 ) {
     val instant: Instant?
         get() = runCatching { Instant.parse(scheduled) }.getOrNull()
@@ -135,6 +137,8 @@ object DataParser {
                 item.optString("image").takeUnless { it == "null" } ?: "",
                 item.optString("window_start"),
                 item.optString("window_end"),
+                pad.optDouble("latitude").takeIf { it.isFinite() && it in -90.0..90.0 },
+                pad.optDouble("longitude").takeIf { it.isFinite() && it in -180.0..180.0 },
             )
         }
 

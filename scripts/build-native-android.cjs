@@ -9,7 +9,8 @@ const {
 const { resolve } = require("node:path");
 const { createHash } = require("node:crypto");
 const root = resolve(__dirname, "..");
-const tasks = [":app:assembleDebug"];
+const variant = process.argv.includes("--optimized") ? "preview" : "debug";
+const tasks = [variant === "preview" ? ":app:assemblePreview" : ":app:assembleDebug"];
 if (process.argv.includes("--test")) tasks.push(":app:testDebugUnitTest");
 if (process.argv.includes("--connected"))
   tasks.push(":app:connectedDebugAndroidTest");
@@ -23,16 +24,17 @@ const result = spawnSync(windows ? "cmd.exe" : "sh", args, {
   env: process.env,
 });
 if (result.status !== 0) process.exit(result.status || 1);
-const original = resolve(
-  root,
-  "android/app/build/outputs/apk/debug/app-debug.apk"
-);
+const apkDirectory = resolve(root, `android/app/build/outputs/apk/${variant}`);
+const metadata = JSON.parse(readFileSync(resolve(apkDirectory, "output-metadata.json"), "utf8"));
+const artifact = metadata.elements[0];
+const original = resolve(apkDirectory, artifact.outputFile);
 if (!existsSync(original))
-  throw new Error("Gradle succeeded but the debug APK is missing.");
+  throw new Error("Gradle succeeded but the APK is missing.");
 const output = resolve(root, "releases/android");
 mkdirSync(output, { recursive: true });
-const file = resolve(output, "T-Zero-v1.1.0-debug.apk");
+const name = `T-Zero-v${artifact.versionName}-${variant}.apk`;
+const file = resolve(output, name);
 copyFileSync(original, file);
 const hash = createHash("sha256").update(readFileSync(file)).digest("hex");
-writeFileSync(`${file}.sha256`, `${hash}  T-Zero-v1.1.0-debug.apk\n`);
+writeFileSync(`${file}.sha256`, `${hash}  ${name}\n`);
 console.log(`\nNative Kotlin APK: ${file}\nSHA-256: ${hash}`);

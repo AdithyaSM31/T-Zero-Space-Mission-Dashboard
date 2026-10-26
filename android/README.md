@@ -1,6 +1,26 @@
 # T-Zero Android v1.1
 
-T-Zero v1.1 is a native **Kotlin + Jetpack Compose** application. The `android/` project no longer depends on Capacitor, a JavaScript bundle, or a WebView. The package remains `com.tzero.app`, with `versionName = 1.1.0` and `versionCode = 2`.
+T-Zero v1.1 is a native **Kotlin + Jetpack Compose** application. The `android/` project no longer depends on Capacitor, a JavaScript bundle, or a WebView. The package remains `com.tzero.app`, with `versionName = 1.1.3` and `versionCode = 5`.
+
+## Smooth scrolling and adaptive refresh (v1.1.1)
+
+Use `npm run build:android:preview` from the repository root for the optimized, non-debuggable, R8-shrunk test APK (`releases/android/T-Zero-v1.1.3-preview.apk`). It uses the local debug signing key so it can replace a test installation signed by that key. Production release signing remains separate. Evaluate scrolling performance with this preview build rather than the development debug variant.
+
+Android 15+ receives a HIGH adaptive frame-rate vote on both the Compose view and native 3D texture view. Earlier Android versions receive the highest supported refresh-rate preference at the display's current resolution; preferences update when displays change and clear when the activity pauses. These are system hints: device display settings, battery saver, thermal policy, and workload still determine actual FPS. No fixed 30/60/90/120 FPS timer is used.
+
+The native renderer follows display vsync during loading and interaction. Static models stop requesting frames after gestures settle; offscreen and paused viewers stop rendering. This avoids continuous GPU work competing with list scrolling. The displayed model frame remains available while idle.
+
+Validation on October 26, 2026: optimized preview APK built successfully; five JVM tests and four Android device tests passed (including adaptive refresh voting and overview scrolling). The optimized APK was separately installed, launched, and visually checked with no runtime errors. APK signing verification confirms the same signing certificate as v1.1.0. The emulator does not establish 90/120 Hz performance on a physical handset.
+
+## Launch-site marker and Earth shading (v1.1.2)
+
+The overview globe uses the featured mission's source-provided launch-pad latitude and longitude. A small pale marker is part of the 3D scene, shares Earth's rotation, and is hidden by the globe when it is on the far side. The initial orientation brings the selected site towards the camera. Missing or invalid coordinates do not produce a fabricated marker.
+
+Earth now uses a darker, lit material rather than an unlit texture, with a directional key light and softer ambient illumination for visible spherical depth. The adaptive refresh and idle-rendering improvements remain. Seven JVM tests and all four Android device tests passed; the real Vandenberg marker and darker globe were visually checked in the emulator.
+
+## Earth shadow artifacts (v1.1.3)
+
+The Earth viewport disables shadow mapping to prevent concentric self-shadow artifacts on the curved mesh when orbiting. Directional/ambient lighting and surface-normal shading remain enabled, preserving its darker appearance and depth. The location marker still uses normal depth occlusion. Heritage-model shadow settings are unchanged. Seven JVM tests and four device tests pass; the optimized APK was separately rotated and visually inspected using native screen captures.
 
 ## Build
 
@@ -24,7 +44,7 @@ macOS/Linux:
 sh ./gradlew :app:assembleDebug :app:testDebugUnitTest
 ```
 
-From the repository root, `npm run build:android` builds and copies the installable debug APK to `releases/android/T-Zero-v1.1.0-debug.apk`, with a SHA-256 file. `npm run check:android` also runs JVM unit tests. These wrappers invoke Gradle; the native build itself does not require a JavaScript runtime.
+From the repository root, `npm run build:android` builds and copies the installable debug APK to `releases/android/T-Zero-v1.1.3-debug.apk`, with a SHA-256 file. `npm run check:android` also runs JVM unit tests. These wrappers invoke Gradle; the native build itself does not require a JavaScript runtime.
 
 The original Gradle output is `app/build/outputs/apk/debug/app-debug.apk`.
 

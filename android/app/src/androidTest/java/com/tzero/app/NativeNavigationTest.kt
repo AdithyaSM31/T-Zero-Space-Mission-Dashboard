@@ -1,12 +1,38 @@
 package com.tzero.app
 
+import android.os.Build
+import android.view.View
+import android.view.ViewGroup
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
 class NativeNavigationTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
+
+    @Test
+    fun highRefreshPreferenceAndOverviewScrollingRemainAvailable() {
+        compose.runOnUiThread {
+            if (Build.VERSION.SDK_INT >= 35) {
+                fun hasHighVote(view: View): Boolean =
+                    view.requestedFrameRate == View.REQUESTED_FRAME_RATE_CATEGORY_HIGH ||
+                        (view is ViewGroup &&
+                            (0 until view.childCount).any { hasHighVote(view.getChildAt(it)) })
+                assertTrue(
+                    "The content must request adaptive high refresh",
+                    hasHighVote(compose.activity.window.decorView),
+                )
+            } else {
+                assertTrue(compose.activity.window.attributes.preferredRefreshRate > 0f)
+            }
+        }
+        compose.onNode(hasScrollAction()).performScrollToNode(hasText("Coming up next"))
+        compose.onNodeWithText("Coming up next").assertIsDisplayed()
+        compose.onNode(hasScrollAction()).performScrollToNode(hasText("A bigger perspective."))
+        compose.onNodeWithText("A bigger perspective.").assertIsDisplayed()
+    }
 
     @Test
     fun overviewEarthLoadsOrbitsAndResets() {
